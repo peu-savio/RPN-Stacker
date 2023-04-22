@@ -1,6 +1,26 @@
-import sys
+# Classe para identificar se um token é um operador ou um número
+class Regex:
+
+  def __init__(self, token):
+    self.token = token
+
+  def isOp(self):
+    # Verifica se o token é um dos operadores básicos (+, -, *, /)
+    if self.token in "+-*/":
+      return True
+    else:
+      return False
+
+  def isNum(self):
+    # Verifica se o token é um número, incluindo números negativos
+    if self.token.isdigit() or (self.token.startswith("-")
+                                and token[1:].isdigit()):
+      return True
+    else:
+      return False
 
 
+# Classe para definir um tipo de token, como "NUM" para números ou "SUM" para soma
 class TokenType:
 
   def __init__(self, token_type, valid_values):
@@ -11,6 +31,7 @@ class TokenType:
     return "{}".format(self.token_type)
 
 
+# Classe para definir um token, contendo um tipo e um valor
 class Token:
 
   def __init__(self, token_type, value):
@@ -22,6 +43,7 @@ class Token:
                                                self.value)
 
 
+# Classe para representar uma pilha na notação polonesa inversa (RPN)
 class RPNStack:
 
   def __init__(self):
@@ -51,35 +73,25 @@ class RPNStack:
         return
       self.push(a / b)
 
-  def evaluate(self, expression):
-    tokens = expression.strip().split()
-    for token in tokens:
-      if token in "+-*/":
-        self.calculate(token)
-      else:
-        try:
-          self.push(float(token))
-        except ValueError:
-          print("Erro: token inválido na expressão")
-          return
-    return self.pop()
-
   def scan(self, expression):
     tokens = expression.strip().split()
     token_list = []
     for token in tokens:
-      if token == "+":
-        token_type = TokenType("SUM", token)
-      elif token == "-":
-        token_type = TokenType("MINUS", token)
-      elif token == "*":
-        token_type = TokenType("MULTIPLY", token)
-      elif token == "/":
-        token_type = TokenType("DIVIDE", token)
-      elif token.isdigit() or (token.startswith("-") and token[1:].isdigit()):
-        token_type = TokenType("NUM", [])
+      reg = Regex(token)
+
+      if reg.isOp():
+        if token == "+":
+          token_type = TokenType("SUM", token)
+        elif token == "-":
+          token_type = TokenType("MINUS", token)
+        elif token == "*":
+          token_type = TokenType("MULTIPLY", token)
+        elif token == "/":
+          token_type = TokenType("DIVIDE", token)
+      elif reg.isNum():
+        token_type = TokenType("NUM", token)
       else:
-        print("Erro: token inválido")
+        print("Erro: token inválido na expressão")
         return
       token_list.append(Token(token_type, token))
     return token_list
